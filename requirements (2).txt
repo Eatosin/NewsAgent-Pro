@@ -1,0 +1,9 @@
+streamlit
+google-generativeai
+langgraph
+langchain_core
+tavily-python
+huggingface_hub
+pillow
+python-dotenv
+anthropic
