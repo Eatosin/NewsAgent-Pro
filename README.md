@@ -1,13 +1,4 @@
----
-title: NewsAgent Pro
-emoji: 💻
-colorFrom: purple
-colorTo: indigo
-sdk: docker
-pinned: false
-license: mit
-short_description: 'Your autonomous AI newsroom '
----
+[View Live Demo](https://huggingface.co/spaces/EATosin/NewsAgent-Pro)
 
 <div align="center">
 
