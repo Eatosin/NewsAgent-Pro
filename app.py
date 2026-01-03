@@ -15,7 +15,8 @@ load_dotenv()
 # Configuration
 PAGE_TITLE = "NewsAgent Pro"
 FONT_URL = "https://github.com/google/fonts/raw/main/ofl/anton/Anton-Regular.ttf"
-IMAGE_MODEL = "black-forest-labs/FLUX.1-dev"
+# SWITCHED TO SCHNELL (Faster, Ungated)
+IMAGE_MODEL = "black-forest-labs/FLUX.1-schnell" 
 LLM_MODEL = "gemini-2.5-flash"
 
 st.set_page_config(page_title=PAGE_TITLE, layout="wide", page_icon="🗞️")
@@ -42,47 +43,25 @@ def get_font(size=80):
         return ImageFont.load_default()
 
 def research_topic(topic):
-    """
-    Retrieves latest news context using Tavily Search API.
-    Returns: (Context String, List of Source Links)
-    """
+    """Retrieves latest news context."""
     try:
-        # Search specifically for NEWS in the last 2 DAYS
         search_result = tavily.search(query=topic, topic="news", days=2)
         results = search_result.get('results', [])
-        
         context = []
-        sources = []
-        
         for res in results[:3]:
             context.append(f"Title: {res['title']}\nSummary: {res['content']}")
-            sources.append(f"🔗 [{res['title']}]({res['url']})")
-            
-        return "\n\n".join(context), sources
+        return "\n\n".join(context)
     except Exception as e:
-        return f"Research failed: {str(e)}", []
+        return f"Research failed: {str(e)}"
 
 def generate_content(platform, topic, research_data):
+    """Generates text copy."""
     if "Twitter" in platform:
-        system_prompt = (
-            "You are a social media ghostwriter. Write a Twitter thread based on the research provided. "
-            "Split tweets using the delimiter '|||'. "
-            "Ensure the first tweet is a strong hook and the last is a call to action. "
-            "Keep each section under 280 characters."
-        )
+        system_prompt = "You are a Viral Twitter Ghostwriter. Write a Thread. Split tweets with '|||'. Keep under 280 chars."
     else:
-        system_prompt = (
-            "You are a professional content strategist. Write a LinkedIn post based on the research provided. "
-            "Focus on business impact, strategic insights, and professional tone. "
-            "Use appropriate line breaks for readability."
-        )
+        system_prompt = "You are a LinkedIn Top Voice. Write a professional, insightful post."
 
-    user_prompt = f"""
-    TOPIC: {topic}
-    RESEARCH DATA: {research_data}
-    
-    SYSTEM INSTRUCTION: {system_prompt}
-    """
+    user_prompt = f"TOPIC: {topic}\nRESEARCH: {research_data}\nINSTRUCTION: {system_prompt}"
     
     try:
         response = editor_model.generate_content(user_prompt)
@@ -91,47 +70,39 @@ def generate_content(platform, topic, research_data):
         return f"Generation failed: {str(e)}"
 
 def generate_visual_asset(topic, platform):
-    prompt = (
-        f"Abstract 3D render representing {topic}, dark navy and black gradient background, "
-        "glass texture, soft studio lighting, minimalist, 8k resolution, negative space, "
-        "high definition, no text, no chaotic details"
-    )
+    """Generates image. Returns (ImageObject, ErrorString)."""
+    prompt = f"Abstract 3D render of {topic}, dark gradient background, minimalist, high tech, 8k, no text"
     
     try:
+        # Generate Image
         image = image_client.text_to_image(prompt)
         
+        # Overlay Logic
         draw = ImageDraw.Draw(image)
         width, height = image.size
+        font = get_font(90)
         
-        font_size = 90
-        font = get_font(font_size)
-        
+        # Text Wrap
         lines = textwrap.wrap(topic.upper(), width=15)
         wrapped_text = "\n".join(lines)
         
+        # Draw Box
         bbox = draw.textbbox((0, 0), wrapped_text, font=font)
         text_height = bbox[3] - bbox[1]
+        box_height = text_height + 150
+        box_y = height - box_height - 50
         
-        padding = 50
-        box_height = text_height + (padding * 3)
-        box_y = height - box_height - 100
-        
-        draw.rectangle(
-            [(0, box_y), (width, height)], 
-            fill=(0, 0, 0, 240)
-        )
-        
-        text_y = box_y + padding
-        draw.text((padding, text_y), wrapped_text, font=font, fill="white")
+        draw.rectangle([(0, box_y), (width, height)], fill=(0, 0, 0, 240))
+        draw.text((50, box_y + 50), wrapped_text, font=font, fill="white")
         
         small_font = get_font(30)
-        draw.text((padding, height - 60), f"GENERATED FOR {platform.upper()}", font=small_font, fill="#00ff00")
+        draw.text((50, height - 60), f"GENERATED FOR {platform.upper()}", font=small_font, fill="#00ff00")
         
-        return image
+        return image, None # Success
     except Exception as e:
-        print(f"Visual generation error: {e}")
-        return None
+        return None, str(e) # Return error message
 
+# --- MAIN UI ---
 def main():
     st.title("NewsAgent Pro")
     st.markdown("Autonomous Multi-Modal Content Engine")
@@ -144,62 +115,56 @@ def main():
 
     with col1:
         st.subheader("Briefing")
-        topic_input = st.text_input("Topic", placeholder="Enter news topic or keyword...")
+        topic_input = st.text_input("Topic", placeholder="Enter news topic...")
         
         if st.button("Generate Content", type="primary"):
             if not topic_input:
-                st.warning("Please enter a topic.")
+                st.warning("Enter a topic.")
                 return
 
-            status = st.status("Initializing Agent Workflow...", expanded=True)
+            status = st.status("Initializing Workflow...", expanded=True)
             
-            # Step 1: Research
-            status.write("Agent: Researching topic...")
-            research_data, sources = research_topic(topic_input)
+            # 1. Research
+            status.write("Agent: Researching...")
+            research_data = research_topic(topic_input)
             
-            # SHOW SOURCES
-            if sources:
-                st.markdown("### 📚 Live Sources Found:")
-                for s in sources:
-                    st.markdown(s)
-            
-            # Step 2: Content Generation
-            status.write("Agent: Drafting copy...")
+            # 2. Write
+            status.write("Agent: Writing...")
             content_draft = generate_content(platform_choice, topic_input, research_data)
             
-            # Step 3: Visual Generation
-            status.write("Agent: Designing assets...")
-            visual_asset = generate_visual_asset(topic_input, platform_choice)
+            # 3. Design (With Error Catching)
+            status.write("Agent: Generating Visuals (Flux Schnell)...")
+            visual_asset, visual_error = generate_visual_asset(topic_input, platform_choice)
             
-            status.update(label="Workflow Complete", state="complete")
+            if visual_error:
+                st.error(f"Image Gen Failed: {visual_error}")
+            else:
+                status.write("✅ Visuals Created.")
+            
+            status.update(label="Complete", state="complete")
             
             st.session_state['content'] = content_draft
             st.session_state['image'] = visual_asset
 
     with col2:
-        st.subheader("Production Output")
+        st.subheader("Output")
         
+        # Show Image
         if 'image' in st.session_state and st.session_state['image']:
-            st.image(st.session_state['image'], use_column_width=True, caption="Generated Asset")
-            
+            st.image(st.session_state['image'], caption="Viral Asset", use_column_width=True)
+            # Download
             buf = io.BytesIO()
             st.session_state['image'].save(buf, format="PNG")
-            st.download_button(
-                label="Download Image",
-                data=buf.getvalue(),
-                file_name="news_asset.png",
-                mime="image/png"
-            )
-
+            st.download_button("Download Image", data=buf.getvalue(), file_name="news.png", mime="image/png")
+        
+        # Show Text
         if 'content' in st.session_state:
-            raw_content = st.session_state['content']
-            
-            if "|||" in raw_content:
-                tweets = raw_content.split("|||")
-                for i, tweet in enumerate(tweets):
-                    st.text_area(f"Tweet {i+1}", value=tweet.strip(), height=120)
+            raw = st.session_state['content']
+            if "|||" in raw:
+                for i, t in enumerate(raw.split("|||")):
+                    st.text_area(f"Tweet {i+1}", t.strip(), height=100)
             else:
-                st.text_area("Post Content", value=raw_content, height=400)
+                st.text_area("Post", raw, height=400)
 
 if __name__ == "__main__":
     main()
