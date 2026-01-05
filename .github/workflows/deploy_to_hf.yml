@@ -16,7 +16,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           # Replace 'EATosin' and 'NewsAgent-Pro' with your exact names
-          HF_URL: "https://eatosin:$HF_TOKEN@huggingface.co/spaces/EATosin/NewsAgent-Pro"
+          HF_URL: "https://EATosin:$HF_TOKEN@huggingface.co/spaces/EATosin/NewsAgent-Pro"
         run: |
           git remote add space $HF_URL
           git push --force space main
