@@ -30,7 +30,7 @@ def planner_node(state: AgentState):
     
     return {
         "hook": parsed.get("hook", ""),
-        "outline": parsed.get("sections", []),
+        "outline": "\n".join(parsed.get("sections", [])),
         "cta": parsed.get("cta", ""),
         "estimated_length": parsed.get("estimated_length", "")
     }
