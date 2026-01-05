@@ -12,7 +12,7 @@ def get_llm(task: str):
     try:
         # Primary: Groq for speed/iteration
         return ChatGroq(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",
             temperature=0.7,
             groq_api_key=os.getenv("GROQ_API_KEY")
         )
