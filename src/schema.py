@@ -5,7 +5,7 @@ class AgentState(BaseModel):
     topic: str
     platform: str  # "twitter" or "linkedin"
     research_data: Optional[List[Dict]] = None 
-    key_facts: Optional[str] = None
+    key_facts: Optional[List[str]] = None
     research: Optional[str] = None
     sources: Optional[List[str]] = None
     outline: Optional[str] = None
