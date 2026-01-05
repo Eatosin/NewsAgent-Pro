@@ -8,5 +8,5 @@ huggingface_hub==0.23.0
 pillow==10.3.0
 pydantic==2.7.0
 python-dotenv==1.0.1
-langchain-community==0.2.0
+langchain-community==0.3.27
 langchain-google-genai
