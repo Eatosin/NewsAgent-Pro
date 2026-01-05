@@ -13,7 +13,7 @@ def perform_research(state: Dict) -> Dict:
     Research Tool: Performs multi-query search on Tavily based on the topic.
     Useful for gathering comprehensive context from multiple angles.
     """
-    topic = state["topic"]
+    topic = state.topic
 
     # Smart query planning (multi-perspective)
     base_queries = [
