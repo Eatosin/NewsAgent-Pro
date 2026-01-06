@@ -10,7 +10,7 @@ from src.agents.designer import designer_node
 # Initialize Graph
 workflow = StateGraph(AgentState)
 
-# Add Nodes (The Employees)
+# Add Nodes
 workflow.add_node("planner", planner_node)
 workflow.add_node("researcher", researcher_node)
 workflow.add_node("writer", writer_node)
