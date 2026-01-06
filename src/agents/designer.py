@@ -13,6 +13,7 @@ hf_client = InferenceClient(
 )
 
 def designer_node(state: AgentState):
+    state = state.model_dump() if hasattr(state, 'model_dump') else state
     hook = state.hook or "Breaking News"
     topic = state.topic or "Latest Developments"
     platform = state.platform.lower()
