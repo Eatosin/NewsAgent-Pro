@@ -14,6 +14,7 @@ class AgentState(BaseModel):
     key_facts: Optional[List[str]] = None
     controversies: Optional[List[str]] = None
     statistics: Optional[List[str]] = None
+    implications: Optional[List[str]] = None
     sources: Optional[List[str]] = None
 
     # Planner/Writer Fields
