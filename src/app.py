@@ -1,10 +1,10 @@
 import streamlit as st
 import base64
 import os
+import time  # <-- This was missing!
 from io import BytesIO
 from src.main import graph
 from src.schema import AgentState
-
 # --- PAGE CONFIG ---
 st.set_page_config(
     page_title="NewsAgent Pro v2", 
