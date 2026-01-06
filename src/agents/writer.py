@@ -4,6 +4,7 @@ from src.utils.prompt_loader import load_prompt
 from src.schema import AgentState
 
 def writer_node(state: AgentState):
+    state = state.model_dump() if hasattr(state, 'model_dump') else state
     platform = state.platform.lower()
     prompt_file = "writer_twitter.yaml" if "twitter" in platform else "writer_linkedin.yaml"
     
