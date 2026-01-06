@@ -1,12 +1,10 @@
-streamlit
-langgraph
-langchain
+streamlit==1.32.0
+langgraph>=0.1.0
+langchain>=0.2.0
 langchain-groq
-google-generativeai
+langchain-google-genai
 tavily-python
 huggingface_hub
 pillow
 pydantic
 python-dotenv
-langchain-community
-langchain-google-genai
