@@ -1,48 +1,55 @@
 import os
+import base64
+from io import BytesIO
 from huggingface_hub import InferenceClient
+from PIL import Image, ImageDraw, ImageFont
 from src.utils.overlays import add_overlay
 from src.schema import AgentState
-from io import BytesIO
-import base64
-from PIL import Image, ImageDraw, ImageFont  # For fallback
 
-# HF Client for FLUX.1-dev (free inference)
+class HybridState:
+    def __init__(self, state):
+        data = state.model_dump() if hasattr(state, 'model_dump') else state
+        self.__dict__.update(data)
+    def get(self, key, default=None):
+        return self.__dict__.get(key, default)
+
+# Initialize Client with Schnell for production speed
 hf_client = InferenceClient(
-    model="black-forest-labs/FLUX.1-dev",
-    token=os.getenv("HF_TOKEN")  # Optional but helps with queue priority
+    model="black-forest-labs/FLUX.1-schnell",
+    token=os.getenv("HF_TOKEN")
 )
 
 def designer_node(state: AgentState):
-    state = state.model_dump() if hasattr(state, 'model_dump') else state
-    hook = state.hook or "Breaking News"
-    topic = state.topic or "Latest Developments"
-    platform = state.platform.lower()
+    """
+    Designer Agent: Generates viral visual assets using Flux.1 and Pillow.
+    """
+    state = HybridState(state)
+    hook = state.get('hook') or "Latest News"
+    topic = state.get('topic') or "Update"
+    platform = state.platform.lower() if state.platform else "twitter"
     
-    # Dynamic image prompt based on topic/platform
     image_prompt = (
-        f"Premium abstract cover image for a viral {platform} thread about '{topic}'. "
-        "Dark futuristic aesthetic, high contrast, geometric patterns, subtle gradients, "
-        "professional and modern, wide aspect ratio (16:9), no text or people, "
-        "cinematic lighting, highly detailed, inspired by premium social media banners"
+        f"Abstract professional cover art for {topic}. "
+        "Dark futuristic aesthetic, minimalist geometry, premium texture, "
+        "cinematic lighting, wide aspect ratio 16:9, no text."
     )
     
-    subtitle = "Thread 🧵" if "twitter" in platform else "In-Depth Analysis"
+    subtitle = "Thread" if "twitter" in platform else "Analysis"
     
     try:
-        # Generate base image with Flux
+        # Schnell requires only 4 steps for high quality
         image = hf_client.text_to_image(
             prompt=image_prompt,
             height=512,
             width=1024,
-            guidance_scale=7.0,
-            num_inference_steps=40  # Balance speed/quality on free tier
+            num_inference_steps=4 
         )
         
         buf = BytesIO()
         image.save(buf, format="PNG")
         base_image_bytes = buf.getvalue()
         
-        # Apply overlay with perfect text
+        # Programmatic text overlay
         overlaid_bytes = add_overlay(
             base_image_bytes=base_image_bytes,
             hook=hook.upper(),
@@ -50,24 +57,15 @@ def designer_node(state: AgentState):
         )
         
     except Exception as e:
-        print(f"Flux generation failed: {e}. Using fallback image.")
-        # Simple dark fallback with text
-        img = Image.new("RGB", (1024, 512), color=(15, 15, 35))
+        # Fail-safe: Generate colored background if API fails
+        img = Image.new("RGB", (1024, 512), color=(20, 20, 40))
         draw = ImageDraw.Draw(img)
-        try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 70)
-        except:
-            font = ImageFont.load_default()
-        draw.text((512, 256), hook.upper(), fill="white", font=font, anchor="mm", stroke_width=3, stroke_fill="black")
+        draw.text((512, 256), hook.upper(), fill="white", anchor="mm")
         buf = BytesIO()
         img.save(buf, format="PNG")
         overlaid_bytes = buf.getvalue()
     
-    # Convert to base64 data URL for Streamlit display
     image_b64 = base64.b64encode(overlaid_bytes).decode("utf-8")
-    image_data_url = f"data:image/png;base64,{image_b64}"
-    
     return {
-        "image_url": image_data_url,
-        "image_prompt_used": image_prompt
+        "image_url": f"data:image/png;base64,{image_b64}"
     }
