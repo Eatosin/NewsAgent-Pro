@@ -5,6 +5,7 @@ from src.schema import AgentState
 import json
 
 def critic_node(state: AgentState):
+    state = state.model_dump() if hasattr(state, 'model_dump') else state
     system_prompt = load_prompt("critic.yaml")
     
     context = f"""
