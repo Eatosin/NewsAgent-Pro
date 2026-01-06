@@ -1,66 +1,119 @@
-
 <div align="center">
 
-# 🗞️ NewsAgent Pro: Autonomous Content Engine
-### *Multi-Modal AI Agent that Researches, Writes, and Designs Viral News.*
+# 🗞️ NewsAgent Pro v2
+### *The Autonomous, Self-Correcting AI Newsroom*
 
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)](https://ai.google.dev/)
-[![Flux](https://img.shields.io/badge/Flux.1-Schnell-blue?style=for-the-badge)](https://huggingface.co/black-forest-labs/FLUX.1-schnell)
-[![Status](https://img.shields.io/badge/Status-Production-success?style=for-the-badge)]()
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![LangGraph](https://img.shields.io/badge/Orchestrator-LangGraph-1C1C1C?style=for-the-badge)](https://langchain-ai.github.io/langgraph/)
+[![Groq](https://img.shields.io/badge/Inference-Groq_Llama_3.3-F55036?style=for-the-badge&logo=groq&logoColor=white)](https://groq.com)
+[![Flux](https://img.shields.io/badge/Visuals-FLUX.1_Schnell-000?style=for-the-badge&logo=huggingface)](https://huggingface.co/black-forest-labs/FLUX.1-schnell)
 
-[View Live Demo](https://huggingface.co/spaces/EATosin/NewsAgent-Pro) • [Architecture](#-system-architecture)
+[View Live Demo](#-live-demo) • [System Architecture](#-system-architecture) • [Deploy Now](#-deployment)
 
 </div>
 
 ---
 
-## ⚡ The Problem: "The Blank Page"
-Content creation is a bottleneck. To post high-quality news updates, a human must research, write, and design.
-**NewsAgent Pro** automates this entire pipeline into a single click.
+## ⚡ The Problem: "Content Fatigue"
+To run a high-quality media channel today, you need a **Researcher** to find facts, a **Writer** to draft hooks, an **Editor** to fix mistakes, and a **Designer** to make thumbnails.
+Doing this manually takes hours. Most "AI Writers" just hallucinate generic slop.
 
 ## 🧠 The Solution: Agentic Workflow
-NewsAgent Pro is a **Multi-Modal Agent** that connects live internet data to state-of-the-art generation models.
+**NewsAgent Pro** is not a chatbot. It is a **Multi-Agent Swarm** that mimics a real newsroom.
+It reads the internet, plans a strategy, drafts content, **critiques its own work**, and designs branded visuals—all in 60 seconds.
 
-### Key Capabilities
-*   **🕵️‍♂️ Real-Time Research:** Uses **Tavily API** to scrape news from the last 48 hours.
-*   **✍️ Adaptive Copywriting:** Uses **Gemini 2.5 Flash** to write platform-specific content (Twitter Threads vs LinkedIn Posts).
-*   **🎨 AI Graphic Design:** Uses **Flux.1-Schnell** (SOTA Latent Diffusion) to generate cinematic background art, then uses **Python Pillow** to programmatically overlay "Newsflash" style headlines.
-*   **🛡️ Robust Error Handling:** Self-healing image generation pipeline with explicit error reporting for API quotas.
+### ✨ Key Innovations (v2.0)
+*   **🔄 Self-Correction Loop:** The **Critic Agent** reads the draft and grades it (1-10). If the score is low, it sends it back to the Writer with specific feedback. It iterates until perfection.
+*   **⚡ Hyper-Fast Inference:** Powered by **Groq (Llama 3.3)** for sub-second logic and planning.
+*   **🕵️‍♂️ Real-Time Truth:** Uses **Tavily API** to scrape live news (last 48 hours), preventing hallucinations.
+*   **🎨 AI Graphic Design:** Uses **Flux.1-Schnell** to generate cinematic backgrounds, then uses **Python Pillow** to programmatically overlay "Newsflash" headlines.
 
 ---
 
 ## ⚙️ System Architecture
 
+The system uses a **Stateful Graph** (LangGraph) with conditional routing.
+
 ```mermaid
 graph LR
-    A[User Input] --> B{Researcher Node}
-    B -->|Tavily API| C[Live News Data]
-    C --> D{Writer Node}
-    D -->|Gemini 2.5| E[Draft Copy]
-    A --> F{Visual Node}
-    F -->|Flux.1-Schnell| G[Background Image]
-    G -->|Pillow| H[Branded Asset]
-    E --> I[Final Output]
-    H --> I
+    A[User Input] --> B(🧠 Planner)
+    B -->|Strategy| C(🕵️‍♂️ Researcher)
+    C -->|Facts| D(✍️ Writer)
+    D --> E{⚖️ Critic}
+    E -->|Score < 8| D
+    E -->|Score > 8| F(🎨 Designer)
+    F -->|Visuals| G[Final Output]
+
+    style E fill:#ff9999,stroke:#333,stroke-width:2px,color:black
+    style F fill:#99ff99,stroke:#333,stroke-width:2px,color:black
 ```
 
-## 🚀 Installation
+### The "Newsroom" Staff
+| Role | Model / Tool | Function |
+| :--- | :--- | :--- |
+| **Planner** | **Llama 3.3 (Groq)** | Analyzes the topic and determines the "Viral Angle." |
+| **Researcher** | **Tavily API** | Scrapes the web for facts/quotes from the last 48 hours. |
+| **Writer** | **Gemini 2.5 / Groq** | Drafts platform-specific content (Threads vs Posts). |
+| **Critic** | **Llama 3.3 (Groq)** | **The Gatekeeper.** Rejects low-quality drafts and forces rewrites. |
+| **Designer** | **Flux.1-Schnell** | Generates 16:9 cinematic cover art in <4 steps. |
 
-### Prerequisites
-*   Python 3.10+
-*   API Keys: Google Gemini, Tavily, Hugging Face Token.
+---
 
-### Docker Deployment
-The project includes a production-ready `Dockerfile` for deployment on Hugging Face Spaces.
+## 🚀 Live Demo
 
-```dockerfile
-# Run on port 7860 (Hugging Face Default)
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+**Try the Production Build on Hugging Face Spaces:**
+
+[![Hugging Face Spaces](https://img.shields.io/badge/🤗%20Launch%20App-NewsAgent_Pro-yellow?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/EATosin/NewsAgent-Pro)
+
+> *Try searching: "DeepSeek vs OpenAI" or "SpaceX Starship Launch"*
+
+---
+
+## 📦 Installation (Local & Cloud)
+
+### 1. Clone & Setup
+```bash
+git clone https://github.com/Eatosin/NewsAgent-Pro.git
+cd NewsAgent-Pro
+pip install -r requirements.txt
 ```
+
+### 2. Configure Environment
+Create a `.env` file with your keys (Get Groq for free speed!):
+```env
+GROQ_API_KEY=gsk_...
+GEMINI_API_KEY=AIza...
+TAVILY_API_KEY=tvly-...
+HF_TOKEN=hf_...
+```
+
+### 3. Run the App
+```bash
+streamlit run src/app.py
+```
+
+### 4. Docker (Production)
+We use a custom multi-stage build to handle system dependencies (Fonts, Pillow):
+```bash
+docker build -t newsagent .
+docker run -p 7860:7860 --env-file .env newsagent
+```
+
+---
+
+## 📈 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Eatosin/NewsAgent-Pro&type=Date)](https://star-history.com/#Eatosin/NewsAgent-Pro&Date)
 
 ---
 
 ## 👨‍💻 Author
 **Owadokun Tosin Tobi**
-*AI Product Engineer*
+*Senior AI Engineer & Product Builder*
+
+*   **Portfolio:** [GitHub](https://github.com/eatosin)
+*   **Connect:** [LinkedIn](https://www.linkedin.com/in/owadokun-tosin-tobi/)
+
+---
+*Built with the Lexpertz R&D Stack.*
