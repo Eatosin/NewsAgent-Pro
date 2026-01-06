@@ -13,7 +13,7 @@ class AgentState(BaseModel):
     platform: str = "twitter"
     
     # Research & Planning
-    research_data: Optional[List[Dict]] = Field(default_factory=list)
+    research_data: Optional[Any] = None
     outline: Optional[str] = None
     hook: Optional[str] = None
     
