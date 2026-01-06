@@ -32,3 +32,5 @@ class AgentState(BaseModel):
     
     # History
     messages: List[Dict] = Field(default_factory=list)
+def get(self, key, default=None):
+        return getattr(self, key, default)
