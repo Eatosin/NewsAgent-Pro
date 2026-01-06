@@ -2,35 +2,56 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Dict, Optional, Any
 
 class AgentState(BaseModel):
-    # Universal Unlock
+    """
+    The shared memory for the Multi-Agent System.
+    Includes 'extra=allow' to prevent validation errors on new fields.
+    """
     model_config = ConfigDict(extra='allow')
 
-    # Core Inputs
-    topic: str
-    platform: str
+    # Input
+    topic: str = ""
+    platform: str = "twitter"
     
-    # Research Data (Flexible: Accepts List or String)
-    research: Optional[Any] = None
-    research_data: Optional[Any] = None
-    key_facts: Optional[Any] = None
-    controversies: Optional[Any] = None
-    statistics: Optional[Any] = None
-    implications: Optional[Any] = None
-    sources: Optional[Any] = None
-
-    # Planner & Writer Outputs
-    hook: Optional[Any] = None
-    cta: Optional[Any] = None
-    outline: Optional[Any] = None
-    draft: Optional[Any] = None
-    critique: Optional[Any] = None
+    # Research & Planning
+    research_data: Optional[List[Dict]] = Field(default_factory=list)
+    outline: Optional[str] = None
+    hook: Optional[str] = None
     
-    # Final Outputs
-    score: int = Field(default=0)
-    final_thread: Optional[Any] = None
+    # Content
+    draft: Optional[str] = None
+    critique: Optional[str] = None
+    score: float = 0.0
+    revision_count: int = 0
+    
+    # Output
+    final_thread: Optional[List[str]] = Field(default_factory=list)
     image_url: Optional[str] = None
+    sources: Optional[List[str]] = Field(default_factory=list)
+
+# 🛠️ UTILITY WRAPPER (Paste this here so it's available everywhere)
+class HybridState:
+    """
+    Universal wrapper to allow both dot-notation (state.topic) 
+    and dict-access (state['topic']).
+    """
+    def __init__(self, state):
+        # Unwrap if it's already a HybridState
+        if isinstance(state, HybridState):
+            self.__dict__ = state.__dict__
+        # Convert Pydantic to dict
+        elif hasattr(state, 'model_dump'):
+            self.__dict__.update(state.model_dump())
+        # Use dict directly
+        elif isinstance(state, dict):
+            self.__dict__.update(state)
+        else:
+            raise ValueError(f"Unknown state type: {type(state)}")
+
+    def get(self, key, default=None):
+        return self.__dict__.get(key, default)
     
-    # History
-    messages: List[Dict] = Field(default_factory=list)
-def get(self, key, default=None):
-        return getattr(self, key, default)
+    def __getitem__(self, key):
+        return self.__dict__.get(key)
+    
+    def __setitem__(self, key, value):
+        self.__dict__[key] = value
