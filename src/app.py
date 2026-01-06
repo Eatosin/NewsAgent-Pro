@@ -1,107 +1,151 @@
 import streamlit as st
+import base64
+import os
+from io import BytesIO
 from src.main import graph
 from src.schema import AgentState
-from langgraph.prebuilt import ToolNode
-import base64
-from io import BytesIO
 
-st.set_page_config(page_title="NewsAgent Pro v2", page_icon="📰", layout="wide")
+# --- PAGE CONFIG ---
+st.set_page_config(
+    page_title="NewsAgent Pro v2", 
+    page_icon="🗞️", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("📰 NewsAgent Pro v2")
-st.caption("Turn any news topic into viral Twitter threads or LinkedIn posts — with premium visuals. Powered by Groq/Gemini + Flux.")
+# --- CUSTOM CSS ---
+st.markdown("""
+<style>
+    .stButton>button {width: 100%; border-radius: 8px; font-weight: bold;}
+    .reportview-container {margin-top: -2em;}
+    h1 {color: #FF4B4B;}
+</style>
+""", unsafe_allow_html=True)
 
-with st.form("input_form"):
-    topic = st.text_input("News Topic", placeholder="e.g., Venezuela oil developments 2026")
-    platform = st.selectbox("Platform", ["Twitter/X", "LinkedIn"])
-    submitted = st.form_submit_button("Generate Thread")
+# --- SIDEBAR ---
+with st.sidebar:
+    st.title("🤖 Agent Command")
+    st.info("System Online v2.0")
+    st.markdown("### ⚙️ Engine Specs")
+    st.markdown("- **Planner:** Llama 3.3 (Groq)")
+    st.markdown("- **Writer:** Gemini 2.5 / Groq")
+    st.markdown("- **Visuals:** Flux.1 Schnell")
+    
+    st.markdown("---")
+    st.write("Authored by **Lexpertz R&D**")
 
-if submitted and topic:
-    with st.spinner("Initializing Agent Swarm..."):
-        config = {"configurable": {"thread_id": "1"}}  # For memory
-        
+# --- MAIN INTERFACE ---
+st.title("🗞️ NewsAgent Pro")
+st.markdown("### Autonomous Multi-Modal Content Engine")
+st.caption("Enter a topic. The AI swarm will Research, Plan, Write, and Design assets automatically.")
+
+# Input Section
+with st.container():
+    col_input, col_btn = st.columns([3, 1])
+    with col_input:
+        topic = st.text_input("Mission Objective (Topic)", placeholder="e.g. DeepSeek vs OpenAI rivalry")
+    with col_btn:
+        platform = st.selectbox("Target Platform", ["Twitter", "LinkedIn"])
+        run_btn = st.button("🚀 Launch Agents", type="primary")
+
+# --- SESSION STATE INITIALIZATION ---
+if "generated_content" not in st.session_state:
+    st.session_state.generated_content = None
+if "generated_image" not in st.session_state:
+    st.session_state.generated_image = None
+if "sources" not in st.session_state:
+    st.session_state.sources = []
+
+# --- EXECUTION LOGIC ---
+if run_btn and topic:
+    # Reset State
+    st.session_state.generated_content = None
+    st.session_state.generated_image = None
+    
+    status_box = st.status("🚀 Initializing Agent Swarm...", expanded=True)
+    
+    try:
+        # Initialize Pydantic State
         initial_state = AgentState(
             topic=topic,
             platform=platform.lower()
         )
         
-        # Stream the graph
-        progress = st.progress(0)
-        status = st.empty()
+        # Run Graph
+        curr_state = initial_state
         
-        # Expected steps for progress bar
-        steps = ["planner", "research_tool", "researcher", "writer", "critic", "designer"]
-        
-        try:
-            for event in graph.stream(initial_state, config, stream_mode="updates"):
-                for node, values in event.items():
-                    # UI Update
-                    status.text(f"Running: {node.replace('_', ' ').title()}...")
-                    if node in steps:
-                        progress.progress((steps.index(node) + 1) / len(steps))
-                    
-                    # 🛠️ CRITICAL FIX: Skip if values are None (Prevents Crash)
-                    if values is None:
-                        continue
-                    
-                    # Update state safely using Pydantic
-                    current_data = initial_state.model_dump()
-                    current_data.update(values)
-                    initial_state = AgentState(**current_data)
-            
-            st.success("Complete! 🚀")
+        # We iterate through the stream updates
+        for event in graph.stream(initial_state):
+            for node_name, values in event.items():
+                # Skip empty updates
+                if not values:
+                    continue
+                
+                # Update status based on active agent
+                if node_name == "planner":
+                    status_box.write("🧠 **Planner:** Strategy & Hook defined.")
+                elif node_name == "researcher":
+                    status_box.write(f"🕵️‍♂️ **Researcher:** Gathered data.")
+                elif node_name == "writer":
+                    status_box.write("✍️ **Writer:** Draft generated.")
+                elif node_name == "designer":
+                    status_box.write("🎨 **Designer:** Visual asset rendered.")
 
-        except Exception as e:
-            st.error(f"Workflow Error: {e}")
-            st.stop()
-    
-    # --- DISPLAY RESULTS ---
-    
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.subheader("Visual Asset")
-        if initial_state.image_url:
-            try:
-                # Handle Base64 Image
-                if "base64" in initial_state.image_url:
-                    st.image(initial_state.image_url, caption="Thread Cover", use_column_width=True)
-                    
-                    # Download Button
-                    img_bytes = base64.b64decode(initial_state.image_url.split(",")[1])
-                    st.download_button(
-                        label="⬇️ Download Image",
-                        data=img_bytes,
-                        file_name="thread_cover.png",
+                # Update local state dict to track progress
+                # Note: LangGraph returns the *changes*, so we update our tracker
+                # For simplicity in this UI loop, we grab final artifacts at the end
+                if "final_thread" in values:
+                    st.session_state.generated_content = values["final_thread"]
+                if "image_url" in values:
+                    st.session_state.generated_image = values["image_url"]
+                if "research_data" in values:
+                    # Extract sources for display
+                    # Assuming research_data is a string in the final state or list of dicts
+                    # Adjust based on your researcher.py output
+                    pass 
+
+        status_box.update(label="✅ Mission Accomplished", state="complete", expanded=False)
+
+    except Exception as e:
+        status_box.update(label="❌ Mission Failed", state="error")
+        st.error(f"Agent Logic Error: {str(e)}")
+
+# --- RESULTS DISPLAY ---
+if st.session_state.generated_content or st.session_state.generated_image:
+    st.divider()
+    res_col1, res_col2 = st.columns([1, 1])
+
+    # LEFT: Visuals
+    with res_col1:
+        st.subheader("🎨 Visual Asset")
+        if st.session_state.generated_image:
+            img_path = st.session_state.generated_image
+            if os.path.exists(img_path):
+                st.image(img_path, caption="Viral Cover Image", use_container_width=True)
+                
+                # Download Button
+                with open(img_path, "rb") as file:
+                    btn = st.download_button(
+                        label="⬇️ Download PNG",
+                        data=file,
+                        file_name=f"newsagent_{int(time.time())}.png",
                         mime="image/png"
                     )
-                else:
-                    # Handle URL Image (Fallback)
-                    st.image(initial_state.image_url, caption="Thread Cover", use_column_width=True)
-            except Exception as e:
-                st.warning(f"Could not render image: {e}")
+            else:
+                st.warning("Image file missing (Docker ephemeral storage).")
         else:
-            st.info("No image generated for this run.")
+            st.info("No visual generated for this run.")
 
-    with col2:
-        st.subheader(f"{platform} Output")
-        if initial_state.final_thread:
-            for i, tweet in enumerate(initial_state.final_thread, 1):
-                st.text_area(f"Part {i}", value=tweet.strip(), height=150)
-            
-            # Download text
-            full_text = "\n\n".join(initial_state.final_thread)
-            st.download_button(
-                label="⬇️ Download Text",
-                data=full_text,
-                file_name="thread.txt",
-                mime="text/plain"
-            )
+    # RIGHT: Copy
+    with res_col2:
+        st.subheader(f"📝 {platform} Draft")
+        content = st.session_state.generated_content
+        
+        if content:
+            if isinstance(content, list): # Twitter Thread
+                for i, tweet in enumerate(content):
+                    st.text_area(f"Tweet {i+1}", value=tweet, height=120)
+            else: # LinkedIn Post
+                st.text_area("Post Content", value=content, height=400)
         else:
-            st.warning("No text content generated.")
-            
-    # Sources Footer
-    if initial_state.sources:
-        st.divider()
-        with st.expander("📚 Verified Sources"):
-            for src in initial_state.sources:
-                st.markdown(f"- {src}")
+            st.info("No text content generated.")
