@@ -59,7 +59,14 @@ graph LR
 | **Designer** | **Flux.1-Schnell** | Generates 16:9 cinematic cover art in <4 steps. |
 
 ---
+## 🖼️ Sample Outputs
 
+| **Twitter Thread (Viral Style)** | **LinkedIn Post (Professional)** |
+| :--- | :--- |
+| **Topic:** "AI Agents 2026"<br>![Twitter Sample](https://X.png/400x225/0f0f23/00ff00?text=AI+AGENTS+TAKEOVER) | **Topic:** "Venezuela Oil Crisis"<br>![LinkedIn Sample](https://LinkedIn.png/400x400/16213e/ffffff?text=MARKET+SHIFT) |
+| *Short, punchy, thread-formatted.* | *Deep dive, strategic analysis.* |
+
+---
 ## 🚀 Live Demo
 
 **Try the Production Build on Hugging Face Spaces:**
