@@ -3,17 +3,41 @@
 # 🗞️ NewsAgent Pro v2
 ### *The Autonomous, Self-Correcting AI Newsroom*
 
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
-[![LangGraph](https://img.shields.io/badge/Orchestrator-LangGraph-1C1C1C?style=for-the-badge)](https://langchain-ai.github.io/langgraph/)
-[![Groq](https://img.shields.io/badge/Inference-Groq_Llama_3.3-F55036?style=for-the-badge&logo=groq&logoColor=white)](https://groq.com)
-[![Flux](https://img.shields.io/badge/Visuals-FLUX.1_Schnell-000?style=for-the-badge&logo=huggingface)](https://huggingface.co/black-forest-labs/FLUX.1-schnell)
+<!-- TECH STACK BADGES -->
+<p>
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/Orchestrator-LangGraph-1C1C1C?style=for-the-badge" alt="LangGraph">
+  <img src="https://img.shields.io/badge/Inference-Groq_Llama_3.3-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq">
+  <img src="https://img.shields.io/badge/Visuals-Flux.1_Schnell-000?style=for-the-badge&logo=huggingface" alt="Flux">
+</p>
 
-[View Live Demo](#-live-demo) • [System Architecture](#-system-architecture) • [Deploy Now](#-deployment)
+<!-- HERO GIF (Clickable) -->
+<a href="https://huggingface.co/spaces/EATosin/NewsAgent-Pro">
+  <img src="assets/NewsAgent_hero.gif" width="100%" alt="NewsAgent Pro Demo" style="border-radius: 8px; box-shadow: 0px 4px 12px rgba(0,0,0,0.3); border: 1px solid #30363d;">
+</a>
+
+<br/><br/>
+
+<!-- CALL TO ACTION BUTTONS -->
+<p>
+  <a href="https://huggingface.co/spaces/EATosin/NewsAgent-Pro">
+    <img src="https://img.shields.io/badge/🚀_Launch_Live_App-blue?style=for-the-badge&logo=huggingface&logoColor=yellow">
+  </a>
+  &nbsp;
+  <a href="#-system-architecture">
+    <img src="https://img.shields.io/badge/⚙️_System_Architecture-grey?style=for-the-badge">
+  </a>
+  &nbsp;
+  <a href="#-installation">
+    <img src="https://img.shields.io/badge/📦_Deploy_Your_Own-black?style=for-the-badge&logo=docker">
+  </a>
+</p>
 
 </div>
 
 ---
+
 
 ## ⚡ The Problem: "Content Fatigue"
 To run a high-quality media channel today, you need a **Researcher** to find facts, a **Writer** to draft hooks, an **Editor** to fix mistakes, and a **Designer** to make thumbnails.
