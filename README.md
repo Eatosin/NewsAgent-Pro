@@ -63,7 +63,7 @@ graph LR
 
 | **Twitter Thread (Viral Style)** | **LinkedIn Post (Professional)** |
 | :--- | :--- |
-| **Topic:** "AI Agents 2026"<br>![Twitter Sample](X.png/400x225/0f0f23/00ff00?text=AI+AGENTS+TAKEOVER) | **Topic:** "Venezuela Oil Crisis"<br>![LinkedIn Sample](LinkedIn.png/400x400/16213e/ffffff?text=MARKET+SHIFT) |
+| **Topic:** "AI Agents 2026"<br>![Twitter Sample](X.png/400x225/0f0f23/00ff00?text=AI+AGENTS+TAKEOVER) | **Topic:** "Venezuela Oil Crisis"<br>![LinkedIn Sample](https://assets.LinkedIn.png/400x400/16213e/ffffff?text=MARKET+SHIFT) |
 | *Short, punchy, thread-formatted.* | *Deep dive, strategic analysis.* |
 
 ---
