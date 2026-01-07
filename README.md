@@ -82,6 +82,7 @@ graph LR
   </tr>
 </table>
 ---
+
 ## 🚀 Live Demo
 
 **Try the Production Build on Hugging Face Spaces:**
