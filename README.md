@@ -61,11 +61,26 @@ graph LR
 ---
 ## 🖼️ Sample Outputs
 
-| **Twitter Thread (Viral Style)** | **LinkedIn Post (Professional)** |
-| :--- | :--- |
-| **Topic:** "AI Agents 2026"<br>![Twitter Sample](X.png/400x225/0f0f23/00ff00?text=AI+AGENTS+TAKEOVER) | **Topic:** "Venezuela Oil Crisis"<br>![LinkedIn Sample](https://assets.LinkedIn.png/400x400/16213e/ffffff?text=MARKET+SHIFT) |
-| *Short, punchy, thread-formatted.* | *Deep dive, strategic analysis.* |
-
+<table width="100%">
+  <tr>
+    <th width="50%">Twitter Thread (Viral Style)</th>
+    <th width="50%">LinkedIn Post (Professional)</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <b>Topic:</b> "AI Agents 2026"<br>
+      <img src="assets/X.png" width="100%" alt="Twitter Sample">
+    </td>
+    <td align="center">
+      <b>Topic:</b> "Venezuela Oil Crisis"<br>
+      <img src="assets/LinkedIn.png" width="100%" alt="LinkedIn Sample">
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><i>Short, punchy, thread-formatted.</i></td>
+    <td align="center"><i>Deep dive, strategic analysis.</i></td>
+  </tr>
+</table>
 ---
 ## 🚀 Live Demo
 
